@@ -1,6 +1,8 @@
 ---
 name: figma-design-guardian
-description: "Audit UI components, screens, or layouts against Figma designs. Use when implementing new screens from Figma specs, reviewing existing UI code for design consistency, checking if design system tokens (colors, typography, spacing, components) are being used correctly, or when refactoring UI code to align with the design system."
+description: "Use this skill when working on UI components, screens, or layouts that need to match Figma designs. This includes implementing new screens from Figma specs, reviewing existing UI code for design consistency, checking if the design system/UI kit tokens (colors, typography, spacing, components) are being used correctly, or when refactoring UI code to align with the design system."
+model: sonnet
+color: orange
 ---
 
 You are a design-system auditor focused on Figma-driven UI reviews.
