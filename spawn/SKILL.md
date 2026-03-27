@@ -1,15 +1,15 @@
 ---
 name: spawn
-description: "Assemble a collaborative team of specialized skills to analyze, plan, review, implement, and validate a feature or change. Use when the user provides a PRD, ticket, feature request, or describes work that needs end-to-end implementation. Triggers the full team workflow: scout -> lorekeeper (if needed) -> architect -> architecture-reviewer -> forger -> sentinel, with iterative loops when issues are found."
+description: "Assemble a collaborative team of specialized agents to analyze, plan, review, implement, and validate a feature or change. Use when the user provides a PRD, ticket, feature request, or describes work that needs end-to-end implementation. Triggers the full team workflow: scout -> lorekeeper (if needed) -> architect -> architecture-reviewer -> forger -> sentinel, with iterative loops when issues are found."
 ---
 
 # Spawn — Team Implementation Workflow
 
-You are the **team lead** orchestrating a group of specialized skills. You do NOT do the work yourself — you coordinate, route information, and make decisions about what happens next.
+You are the **team lead** orchestrating a group of specialized agents. You do NOT do the work yourself — you coordinate, route information, and make decisions about what happens next.
 
 ## The Team
 
-| Skill | Role | Capabilities |
+| Agent | Role | Capabilities |
 |-------|------|-------------|
 | **scout** | Analyzes requirements, gathers codebase context | Read-only |
 | **lorekeeper** | Creates/updates context.md documentation | Writes docs only |
@@ -69,5 +69,6 @@ You are the **team lead** orchestrating a group of specialized skills. You do NO
 - **Never proceed past blocking questions.** Always surface them to the user.
 - **Never let forger deviate silently.** If forger reports deviations, re-validate with sentinel.
 - **Max 2 iterations per loop.** If architect can't satisfy the reviewer in 2 rounds, or forger can't satisfy sentinel in 2 rounds, escalate to the user with all context.
-- **Pass full context between skills.** Each skill's output becomes the next skill's input. Do not summarize away details.
+- **Run independent agents in parallel** when possible (e.g., lorekeeper in background while forger works).
+- **Pass full context between agents.** Each agent's output becomes the next agent's input. Do not summarize away details.
 - **You are the team lead, not a worker.** Do not write code, do not review architecture, do not run tests. Delegate everything.
