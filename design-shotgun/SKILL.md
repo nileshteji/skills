@@ -1,0 +1,1 @@
+/Users/nileshteji/dot-files/skills/gstack/design-shotgun/SKILL.md

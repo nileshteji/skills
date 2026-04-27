@@ -1,0 +1,1 @@
+/Users/nileshteji/dot-files/skills/gstack/setup-gbrain/SKILL.md
