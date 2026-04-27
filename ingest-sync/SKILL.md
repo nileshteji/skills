@@ -1,6 +1,6 @@
 ---
 name: ingest-sync
-description: "Compare raw/ against wiki/ingested.md in a NileshBrain-style repo, automatically ingest any untracked markdown sources into the wiki, then refresh qmd and embed pending vectors when available. Use when you want one command to detect new raw files, process them, update tracker files, and run qmd update/embed."
+description: "Compare raw/ against wiki/ingested.md in a NileshBrain-style repo, automatically ingest any untracked markdown sources into the wiki, update tracker files, and report issues. Use when you want one command to detect new raw files and process them without extra indexing tooling."
 model: sonnet
 color: cyan
 ---
@@ -19,26 +19,20 @@ Use this skill in a NileshBrain-style repository with this structure:
 
 1. Detect markdown files in `raw/` that are missing from `wiki/ingested.md`
 2. Automatically ingest all missing files in one pass
-3. Refresh the qmd index
-4. Run qmd embeddings when vector support is available
-5. Continue even if embedding is unavailable or fails, and report that clearly
+3. Update wiki pages and trackers without extra indexing steps
+4. Report missing tracked files, contradictions, and ambiguities clearly
 
 ## Preflight
 
 Run these checks first:
 
 ```bash
-command -v qmd
-qmd status
 python3 <skill-dir>/scripts/compare_ingested.py .
+find raw -type f \( -name "*.md" -o -name "*.markdown" \)
+find wiki -type f | sort
 ```
 
-Treat vector mode as unavailable if `qmd status` or `qmd embed` reports either of these:
-
-- `sqlite-vec is not available`
-- `sqlite-vec extension is unavailable`
-
-If `qmd` is missing, stop and tell the user.
+If the repository is missing expected directories or tracker files, stop and tell the user what is missing.
 
 ## Comparison Helper
 
@@ -61,7 +55,7 @@ It returns JSON with:
 For every file in `missing_from_tracker`, do all of the following without asking for confirmation:
 
 1. Read the source file thoroughly.
-2. Create a source summary page in `wiki/sources/`.
+2. Create a detailed source summary page in `wiki/sources/`.
 3. Create or update relevant entity pages in `wiki/entities/`.
 4. Create or update relevant concept pages in `wiki/concepts/`.
 5. Add cross-links with Obsidian wikilinks.
@@ -78,32 +72,47 @@ Follow the repo schema in `CLAUDE.md`:
 - flag contradictions when sources conflict
 - keep claims traceable to the source file being ingested
 
-## qmd Refresh Workflow
+## Writing Style for Wiki Pages
 
-After wiki edits are complete:
+The wiki is meant to be read by a human, not just used as a machine index.
+Write pages so they are clear, useful, and worth reading later.
+
+When writing or updating wiki pages:
+
+- prefer elaborated summaries over terse notes
+- explain the core idea, why it matters, and how it connects to nearby topics
+- preserve concrete details, examples, decisions, timelines, and named people when relevant
+- synthesize multiple points into readable prose instead of dumping bullet fragments
+- use headings and structure so long pages stay scannable
+- include concise bullet lists only when they improve readability
+- make entity and concept pages feel like durable reference pages, not scratch notes
+- when a source is dense, capture both the high-level takeaway and the important specifics
+
+Aim for wiki pages that someone could read later to actually understand the topic without reopening the raw file immediately.
+## Search and Discovery Guidance
+
+Do not rely on external indexing tools for this skill.
+Use normal file discovery and direct reading instead:
 
 ```bash
-qmd update
-qmd status
+find raw -type f \( -name "*.md" -o -name "*.markdown" \)
+rg -n "term" wiki raw
 ```
 
-If vector support is available, run:
+When deciding whether to update an existing wiki page or create a new one:
 
-```bash
-qmd embed
-qmd status
-```
-
-If `qmd embed` fails because vector support is unavailable, do **not** roll back wiki edits. Report that ingest succeeded but embeddings were skipped or failed.
+1. Search `wiki/` for relevant entity names, concepts, aliases, and phrases.
+2. Read the best candidate pages directly.
+3. Merge into existing pages when the topic already exists.
+4. Create a new page only when no good existing page fits.
 
 ## No-Op Case
 
 If `missing_from_tracker` is empty:
 
 1. Do not modify wiki content unnecessarily.
-2. Still inspect `qmd status`.
-3. If qmd reports pending embeddings and vector mode is healthy, run `qmd embed`.
-4. Report that no new raw files needed ingest.
+2. Report that no new raw files needed ingest.
+3. Still report any files tracked in `wiki/ingested.md` but missing on disk.
 
 ## Output Format
 
@@ -113,23 +122,16 @@ If `missing_from_tracker` is empty:
 - Wiki pages updated
 - Tracker entries added
 
-### qmd Status
-- Whether `qmd update` ran
-- Whether `qmd embed` ran
-- Whether vector mode was available
-- Remaining pending embeddings, if any
-
 ### Issues
 - Files tracked in `wiki/ingested.md` but missing on disk
 - Any ingest ambiguities or contradictions found
-- Any embedding failures
+- Any schema or structure problems that blocked ingest
 
 ## Rules
 
 - Do not ask for per-file confirmation.
 - Do not modify files under `raw/`.
 - Do not mark a file as `ingested` unless the wiki updates are complete.
-- Do not use `qmd collection sync`.
-- Use `qmd update` and `qmd embed` only as described above.
+- Do not introduce indexing, embedding, or collection-management steps.
 - If no supporting wiki/entity/concept page exists yet, create it.
 - If a matching page already exists, update it instead of creating duplicates.
